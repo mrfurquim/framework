@@ -112,7 +112,7 @@ function SetInterval(callback, interval, ...)
         return error(('Callback must be a function. Received %s'):format(cbType))
     end
 
-	local args, id = { ... }, nil
+	local args, id = { ... }
 
 	Citizen.CreateThreadNow(function(ref)
 		id = ref

@@ -34,3 +34,5 @@ function lib.versionCheck(repository)
 		end, 'GET')
 	end)
 end
+
+lib.versionCheck('overextended/ox_lib')

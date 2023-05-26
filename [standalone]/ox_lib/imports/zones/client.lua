@@ -11,7 +11,7 @@ local glm = require 'glm'
 ---@field inside fun(self: CZone)?
 ---@field [string] any
 
----@type { [number]: CZone }
+---@type table<number, CZone>
 Zones = {}
 
 local function nextFreePoint(points, b, len)
@@ -90,8 +90,11 @@ local function getTriangles(polygon)
     return triangles
 end
 
+---@type table<number, CZone>
 local insideZones = {}
+---@type table<number, CZone>
 local enteringZones = {}
+---@type table<number, CZone>
 local exitingZones = {}
 local enteringSize = 0
 local exitingSize = 0
@@ -112,7 +115,7 @@ CreateThread(function()
 
         for _, zone in pairs(Zones) do
             zone.distance = #(zone.coords - coords)
-            local radius, contains = zone.radius, nil
+            local radius, contains = zone.radius
 
             if radius then
                 contains = zone.distance < radius
@@ -200,8 +203,38 @@ CreateThread(function()
     end
 end)
 
+local DrawLine = DrawLine
+local DrawPoly = DrawPoly
+
+local function debugPoly(self)
+    for i = 1, #self.triangles do
+        local triangle = self.triangles[i]
+        DrawPoly(triangle[1].x, triangle[1].y, triangle[1].z, triangle[2].x, triangle[2].y, triangle[2].z, triangle[3].x
+            ,
+            triangle[3].y, triangle[3].z, 255, 42, 24, 100)
+        DrawPoly(triangle[2].x, triangle[2].y, triangle[2].z, triangle[1].x, triangle[1].y, triangle[1].z, triangle[3].x
+            ,
+            triangle[3].y, triangle[3].z, 255, 42, 24, 100)
+    end
+    for i = 1, #self.polygon do
+        local thickness = vec(0, 0, self.thickness / 2)
+        local a = self.polygon[i] + thickness
+        local b = self.polygon[i] - thickness
+        local c = (self.polygon[i + 1] or self.polygon[1]) + thickness
+        local d = (self.polygon[i + 1] or self.polygon[1]) - thickness
+        DrawLine(a.x, a.y, a.z, b.x, b.y, b.z, 255, 42, 24, 225)
+        DrawLine(a.x, a.y, a.z, c.x, c.y, c.z, 255, 42, 24, 225)
+        DrawLine(b.x, b.y, b.z, d.x, d.y, d.z, 255, 42, 24, 225)
+        DrawPoly(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z, 255, 42, 24, 100)
+        DrawPoly(c.x, c.y, c.z, b.x, b.y, b.z, a.x, a.y, a.z, 255, 42, 24, 100)
+        DrawPoly(b.x, b.y, b.z, c.x, c.y, c.z, d.x, d.y, d.z, 255, 42, 24, 100)
+        DrawPoly(d.x, d.y, d.z, c.x, c.y, c.z, b.x, b.y, b.z, 255, 42, 24, 100)
+    end
+end
+
 local function debugSphere(self)
-    DrawMarker(28, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, self.radius, self.radius, self.radius, 255, 42, 24, 100, false, false, 0, false)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    DrawMarker(28, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, self.radius, self.radius, self.radius, 255, 42, 24, 100, false, false, 0, false, false, false, false)
 end
 
 local function contains(self, coords)
@@ -298,6 +331,7 @@ lib.zones = {
 
         if data.debug then
             data.triangles = getTriangles(data.polygon)
+            data.debug = debugPoly
         end
 
         Zones[data.id] = data
@@ -322,6 +356,7 @@ lib.zones = {
 
         if data.debug then
             data.triangles = { mat(data.polygon[1], data.polygon[2], data.polygon[3]), mat(data.polygon[1], data.polygon[3], data.polygon[4]) }
+            data.debug = debugPoly
         end
 
         Zones[data.id] = data
@@ -343,6 +378,11 @@ lib.zones = {
         Zones[data.id] = data
         return data
     end,
+
+    getAllZones = function() return Zones end,
+
+    getCurrentZones = function() return insideZones end,
 }
+
 
 return lib.zones

@@ -54,6 +54,7 @@ function lib.showMenu(id, startIndex)
             while openMenu do
                 if openMenu.disableInput == nil or openMenu.disableInput then
                     DisablePlayerFiring(cache.playerId, true)
+                    HudWeaponWheelIgnoreSelection()
                     DisableControlAction(0, control, true)
                 end
 

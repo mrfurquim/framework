@@ -5,7 +5,7 @@
 -- Credit: VORP (outsider31000 & AndrewR3K) @ https://github.com/VORPCORE/vorp_zonenotify
 -- Edits by Sinatra#0101 for RPX
 
-local zoneData = require 'client.data.zones.lua'
+local zoneData = require 'client.data.zones'
 
 local function GetCardinalDirection(h)
     if h <= 22.5 then

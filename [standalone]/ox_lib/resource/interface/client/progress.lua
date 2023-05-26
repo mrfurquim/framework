@@ -27,7 +27,7 @@ local function createProp(prop)
     local coords = GetEntityCoords(cache.ped)
     local object = CreateObject(prop.model, coords.x, coords.y, coords.z, true, true, true)
 
-    AttachEntityToEntity(object, cache.ped, GetEntityBoneIndexByName(cache.ped, prop.bone), prop.pos.x, prop.pos.y, prop.pos.z, prop.rot.x, prop.rot.y, prop.rot.z, true, true, false, true, 0, true)
+    AttachEntityToEntity(object, cache.ped, GetPedBoneIndex(cache.ped, prop.bone or 60309), prop.pos.x, prop.pos.y, prop.pos.z, prop.rot.x, prop.rot.y, prop.rot.z, true, true, false, true, 0, true)
     SetModelAsNoLongerNeeded(prop.model)
 
     return object
@@ -67,7 +67,7 @@ local function startProgress(data)
         if anim.dict then
             lib.requestAnimDict(anim.dict)
 
-            TaskPlayAnim(cache.ped, anim.dict, anim.clip, anim.blendIn or 1.0, anim.blendOut or 8.0, anim.duration or -1, anim.flag or 31, anim.playbackRate or 0, false, false, false)
+            TaskPlayAnim(cache.ped, anim.dict, anim.clip, anim.blendIn or 3.0, anim.blendOut or 1.0, anim.duration or -1, anim.flag or 49, anim.playbackRate or 0, anim.lockX, anim.lockY, anim.lockZ)
             RemoveAnimDict(anim.dict)
         elseif anim.scenario then
             TaskStartScenarioInPlace(cache.ped, anim.scenario, 0, anim.playEnter ~= nil and anim.playEnter or true)
@@ -147,10 +147,8 @@ local function startProgress(data)
     end
 
     playerState.invBusy = false
-    local cancel = progress == false
-    progress = nil
 
-    if cancel then
+    if progress == false then
         SendNUIMessage({ action = 'progressCancel' })
         return false
     end
@@ -161,7 +159,7 @@ end
 ---@param data ProgressProps
 ---@return boolean?
 function lib.progressBar(data)
-    while progress ~= nil do Wait(100) end
+    while progress ~= nil do Wait(0) end
 
     if not interruptProgress(data) then
         SendNUIMessage({
@@ -179,7 +177,7 @@ end
 ---@param data ProgressProps
 ---@return boolean?
 function lib.progressCircle(data)
-    while progress ~= nil do Wait(100) end
+    while progress ~= nil do Wait(0) end
 
     if not interruptProgress(data) then
         SendNUIMessage({
