@@ -1,0 +1,734 @@
+local legendsCore = exports['legends-core']:GetCoreObject()
+
+local doorLockPrompt = GetRandomIntInRange(0, 0xffffff)
+local lockPrompt = nil
+local DoorID = nil
+local HouseID = nil
+local checked = false
+local doorStatus = '~e~Locked~q~'
+local createdEntries = {}
+local doorLists = {}
+
+
+--[[ Functions: Start ]]--
+
+-- Door Lock / Unlock Animation
+local UnlockAnimation = function()
+    local ped = PlayerPedId()
+    local boneIndex = GetEntityBoneIndexByName(ped, "SKEL_R_Finger12")
+    local dict = "script_common@jail_cell@unlock@key"
+
+    if not HasAnimDictLoaded(dict) then
+        RequestAnimDict(dict)
+
+        while not HasAnimDictLoaded(dict) do
+            Citizen.Wait(10)
+        end
+    end
+
+    local prop = CreateObject("P_KEY02X", GetEntityCoords(ped) + vec3(0, 0, 0.2), true, true, true)
+
+    TaskPlayAnim(ped, "script_common@jail_cell@unlock@key", "action", 8.0, -8.0, 2500, 31, 0, true, 0, false, 0, false)
+    Wait(750)
+    AttachEntityToEntity(prop, ped, boneIndex, 0.02, 0.0120, -0.00850, 0.024, -160.0, 200.0, true, true, false, true, 1, true)
+
+    while IsEntityPlayingAnim(ped, "script_common@jail_cell@unlock@key", "action", 3) do
+        Wait(100)
+    end
+
+    DeleteObject(prop)
+end
+
+local DoorLockPrompt = function()
+    local str = 'Use'
+    local stra = CreateVarString(10, 'LITERAL_STRING', str)
+
+    lockPrompt = PromptRegisterBegin()
+    PromptSetControlAction(lockPrompt, legendsCore.Shared.Keybinds['ENTER'])
+    PromptSetText(lockPrompt, stra)
+    PromptSetEnabled(lockPrompt, 1)
+    PromptSetVisible(lockPrompt, 1)
+    PromptSetHoldMode(lockPrompt, true)
+    PromptSetGroup(lockPrompt, doorLockPrompt)
+    PromptRegisterEnd(lockPrompt)
+
+    createdEntries[#createdEntries + 1] = {type = "nPROMPT", handle = lockPrompt}
+    createdEntries[#createdEntries + 1] = {type = "nPROMPT", handle = doorLockPrompt}
+end
+
+--[[ Functions: Start ]]--
+
+
+
+--[[ Threads: Start ]]--
+
+-- Real Estate Agent Prompts
+CreateThread(function()
+    for i = 1, #Config.EstateAgents do
+        local agent = Config.EstateAgents[i]
+
+        exports['legends-target']:AddBoxZone(agent.prompt, agent.coords, 1, 1, {
+            name = "housingAgent",
+            heading = 0,
+            debugPoly = false,
+            minZ = -400,
+            maxZ = 400,
+}, {
+    options = {
+        {
+            type = "client",
+            action = function(entity) 
+                    TriggerEvent('legends-houses:client:agentmenu', agent.location)
+                  end,
+            icon = "fas fa-house",
+            label = "TALK TO AGENT",
+        },
+    },
+    distance = 2.5
+})
+
+        createdEntries[#createdEntries + 1] = {type = "PROMPT", handle = agent.prompt}
+
+        if agent.showblip then
+            local AgentBlip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, agent.coords)
+            local blipSprite = GetHashKey(Config.Blip.blipSprite)
+
+            SetBlipSprite(AgentBlip, blipSprite, true)
+            SetBlipScale(AgentBlip, Config.Blip.blipScale)
+            Citizen.InvokeNative(0x9CB1A1623062F402, AgentBlip, Config.Blip.blipName)
+
+            createdEntries[#createdEntries + 1] = {type = "BLIP", handle = AgentBlip}
+        end
+    end
+end)
+
+-- House Blips
+CreateThread(function()
+    for i = 1, #Config.Houses do
+        local house = Config.Houses[i]
+
+        if house.showblip then
+            local HouseBlip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, house.blipcoords)
+
+            SetBlipSprite(HouseBlip, `blip_proc_home`, true)
+            SetBlipScale(HouseBlip, 0.2)
+            Citizen.InvokeNative(0x9CB1A1623062F402, HouseBlip, house.name)
+
+            createdEntries[#createdEntries + 1] = {type = "BLIP", handle = HouseBlip}
+        end
+    end
+end)
+
+-- Get Door State from Database and Set
+CreateThread(function()
+    while true do
+        checked = false
+
+        legendsCore.Functions.TriggerCallback('legends-houses:server:GetDoorState', function(results)
+            for i = 1, #results do
+                local door = results[i]
+
+                Citizen.InvokeNative(0xD99229FE93B46286, tonumber(door.doorid), 1, 1, 0, 0, 0, 0) -- AddDoorToSystemNew
+                Citizen.InvokeNative(0x6BAB9442830C7F53, tonumber(door.doorid), door.doorstate) -- DoorSystemSetDoorState
+            end
+        end)
+
+        Wait(10000)
+    end
+end)
+
+Citizen.CreateThread(function()
+    for houses, v in pairs(Config.HouseDoors) do
+        local doorcoords = v.doorcoords
+        exports['legends-target']:AddBoxZone(v.doorid, doorcoords, 1, 1, {
+            name = "housing",
+            heading = 0,
+            debugPoly = false,
+            minZ = -400,
+            maxZ = 400,
+        }, {
+            options = {
+        {
+            type = "client",
+            action = function(entity) 
+                    TriggerEvent('legends-houses:client:toggledoor', v.doorid, v.houseid)
+                  end,
+            icon = "fas fa-key",
+            label = "Usar Chave",
+        },
+    },
+    distance = 2.5
+})
+    end
+end)
+
+-- House Menu Prompt
+CreateThread(function()
+    for i = 1, #Config.Houses do
+        local house = Config.Houses[i]
+
+        exports['legends-core']:createPrompt(house.houseprompt, house.menucoords, legendsCore.Shared.Keybinds['J'], 'Open House Menu',
+        {
+            type = 'client',
+            event = 'legends-houses:client:housemenu',
+            args = {house.houseid},
+        })
+
+        createdEntries[#createdEntries + 1] = {type = "PROMPT", handle = house.houseprompt}
+    end
+end)
+
+--[[ Threads: End ]]--
+
+
+
+--[[ Events: Start ]]--
+
+-- Real Estate Agent Menu
+RegisterNetEvent('legends-houses:client:GetSpecificDoorState', function(id, state)
+    DoorID = id
+    local doorstate = state
+
+    if doorstate == 1 then
+        doorStatus = '~e~Locked~q~'
+    else
+        doorStatus = '~t6~Unlocked~q~'
+    end
+end)
+
+RegisterNetEvent('legends-houses:client:agentmenu', function(location)
+    exports['legends-menu']:openMenu(
+    {
+        {
+            header = 'Estate Agent',
+            isMenuHeader = true,
+        },
+        {
+            header = 'Buy Property',
+            txt = '',
+            icon = "fas fa-home",
+            params = {
+                event = 'legends-houses:client:buymenu',
+                isServer = false,
+                args = { agentlocation = location }
+            }
+        },
+        {
+            header = 'Sell Property',
+            txt = '',
+            icon = "fas fa-home",
+            params = {
+                event = 'legends-houses:client:sellmenu',
+                isServer = false,
+                args = { agentlocation = location }
+            }
+        },
+        {
+            header = 'Close Menu',
+            txt = '',
+            params = {
+                event = 'legends-menu:closeMenu'
+            }
+        }
+    })
+end)
+
+-- Buy House Menu
+RegisterNetEvent('legends-houses:client:buymenu', function(data)
+    local GetHouseInfo =
+    {
+        {
+            header = 'Comprar Casa',
+            isMenuHeader = true,
+            icon = "fas fa-home"
+        }
+    }
+
+    legendsCore.Functions.TriggerCallback('legends-houses:server:GetHouseInfo', function(cb)
+        for i = 1, #cb do
+            local house = cb[i]
+            local agent = house.agent
+            local houseid = house.houseid
+            local owned = house.owned
+            local price = house.price
+
+            if agent == data.agentlocation and owned == 0 then
+                GetHouseInfo[#GetHouseInfo + 1] =
+                {
+                    header = houseid,
+                    txt = 'Price $'..house.price..' : Land Tax $'..Config.LandTaxPerCycle,
+                    icon = "fas fa-home",
+                    params =
+                    {
+                        event = 'legends-houses:server:buyhouse',
+                        args =
+                        {
+                            house = houseid,
+                            price = price
+                        },
+                        isServer = true
+                    }
+                }
+            end
+        end
+
+        exports['legends-menu']:openMenu(GetHouseInfo)
+    end)
+end)
+
+-- Sell House Menu
+RegisterNetEvent('legends-houses:client:sellmenu', function(data)
+    local GetOwnedHouseInfo =
+    {
+        {
+            header = 'Sell House',
+            isMenuHeader = true,
+            icon = "fas fa-home"
+        }
+    }
+
+    legendsCore.Functions.TriggerCallback('legends-houses:server:GetOwnedHouseInfo', function(cb)
+        for i = 1, #cb do
+            local house = cb[i]
+            local agent = house.agent
+            local houseid = house.houseid
+            local owned = house.owned
+            local sellprice = (house.price * Config.SellBack)
+
+            if agent == data.agentlocation and owned == 1 then
+                GetOwnedHouseInfo[#GetOwnedHouseInfo + 1] =
+                {
+                    header = houseid,
+                    txt = 'Sell Price $'..sellprice,
+                    icon = "fas fa-home",
+                    params =
+                    {
+                        event = 'legends-houses:server:sellhouse',
+                        args =
+                        {
+                            house = houseid,
+                            price = sellprice
+                        },
+                        isServer = true
+                    }
+                }
+            end
+        end
+
+        exports['legends-menu']:openMenu(GetOwnedHouseInfo)
+    end)
+end)
+
+-- Lock / Unlock Door
+RegisterNetEvent('legends-houses:client:toggledoor', function(door, house)
+    legendsCore.Functions.TriggerCallback('legends-houses:server:GetHouseKeys', function(results)
+        for i = 1, #results do
+            local housekey = results[i]
+            local playercitizenid = legendsCore.Functions.GetPlayerData().citizenid
+            local resultcitizenid = housekey.citizenid
+            local resulthouseid = housekey.houseid
+
+            if resultcitizenid == playercitizenid and resulthouseid == house then
+                legendsCore.Functions.TriggerCallback('legends-houses:server:GetCurrentDoorState', function(cb)
+                    local doorstate = cb
+
+                    if doorstate == 1 then
+                        UnlockAnimation()
+
+                        Citizen.InvokeNative(0xD99229FE93B46286, door, 1, 1, 0, 0, 0, 0) -- AddDoorToSystemNew
+                        Citizen.InvokeNative(0x6BAB9442830C7F53, door, 0) -- DoorSystemSetDoorState
+
+                        TriggerServerEvent('legends-houses:server:UpdateDoorState', door, 0)
+
+                        legendsCore.Functions.Notify('Unlocked!', 'success')
+
+                        doorStatus = '~t6~Unocked~q~'
+                    end
+
+                    if doorstate == 0 then
+                        UnlockAnimation()
+
+                        Citizen.InvokeNative(0xD99229FE93B46286, door, 1, 1, 0, 0, 0, 0) -- AddDoorToSystemNew
+                        Citizen.InvokeNative(0x6BAB9442830C7F53, door, 1) -- DoorSystemSetDoorState
+
+                        TriggerServerEvent('legends-houses:server:UpdateDoorState', door, 1)
+
+                        legendsCore.Functions.Notify('Locked!', 'error')
+
+                        doorStatus = '~e~Locked~q~'
+                    end
+                end, door)
+            end
+
+            createdEntries[#createdEntries + 1] = {type = "DOOR", handle = door}
+        end
+    end)
+end)
+
+-- House Menu
+RegisterNetEvent('legends-houses:client:housemenu', function(houseid)
+    legendsCore.Functions.TriggerCallback('legends-houses:server:GetHouseKeys', function(results)
+        for i = 1, #results do
+            local housekey = results[i]
+            local playercitizenid = legendsCore.Functions.GetPlayerData().citizenid
+            local citizenid = housekey.citizenid
+            local houseids = housekey.houseid
+            local guest = housekey.guest
+
+            if citizenid == playercitizenid and houseids == houseid and guest == 0 then
+                exports['legends-menu']:openMenu(
+                {
+                    {
+                        header = 'Owner House Menu',
+                        isMenuHeader = true,
+                        icon = "fas fa-home"
+                    },
+                    {
+                        header = 'Open Storage',
+                        txt = '',
+                        icon = 'fas fa-box',
+                        params = {
+                            event = 'legends-houses:client:storage',
+                            isServer = false,
+                            args = {house = houseid}
+                        }
+                    },
+                    {
+                        header = 'Outfits',
+                        txt = '',
+                        icon = 'fas fa-hat-cowboy-side',
+                        params = {
+                            event = 'legends-clothes:OpenOutfits',
+                            isServer = false,
+                            args = {}
+                        }
+                    },
+                    {
+                        header = 'Land Tax',
+                        txt = '',
+                        icon = 'fas fa-dollar-sign',
+                        params = {
+                            event = 'legends-houses:client:creditmenu',
+                            isServer = false,
+                            args = {house = houseid}
+                        }
+                    },
+                    {
+                        header = 'House Guests',
+                        txt = '',
+                        icon = 'fa-solid fa-circle-user',
+                        params = {
+                            event = 'legends-houses:client:guestmenu',
+                            isServer = false,
+                            args = {house = houseid}
+                        }
+                    },
+                    {
+                        header = 'Close Menu',
+                        txt = '',
+                        icon = "fas fa-times",
+                        params = {
+                            event = 'legends-menu:closeMenu'
+                        }
+                    }
+                })
+            elseif citizenid == playercitizenid and houseids == houseid and guest == 1 then
+                exports['legends-menu']:openMenu(
+                {
+                    {
+                        header = 'Guest House Menu',
+                        isMenuHeader = true,
+                        icon = "fas fa-home"
+                    },
+                    {
+                        header = 'Open Storage',
+                        txt = '',
+                        icon = 'fas fa-box',
+                        params = {
+                            event = 'legends-houses:client:storage',
+                            isServer = false,
+                            args = {house = houseid}
+                        }
+                    },
+                    {
+                        header = 'Outfits',
+                        txt = '',
+                        icon = 'fas fa-hat-cowboy-side',
+                        params = {
+                            event = 'legends-clothes:OpenOutfits',
+                            isServer = false,
+                            args = {}
+                        }
+                    },
+                    {
+                        header = 'Close Menu',
+                        txt = '',
+                        icon = "fas fa-times",
+                        params = {
+                            event = 'legends-menu:closeMenu'
+                        }
+                    }
+                })
+            end
+        end
+    end)
+end)
+
+-- House Credit Menu
+RegisterNetEvent('legends-houses:client:creditmenu', function(data)
+    legendsCore.Functions.TriggerCallback('legends-houses:server:GetOwnedHouseInfo', function(result)
+        local housecitizenid = result[1].citizenid
+        local houseid = result[1].houseid
+        local credit = result[1].credit
+        local playercitizenid = legendsCore.Functions.GetPlayerData().citizenid
+
+        if housecitizenid ~= playercitizenid then
+            legendsCore.Functions.Notify('You didn\'t own this house!', 'error')
+            return
+        end
+
+        if housecitizenid == playercitizenid then
+            exports['legends-menu']:openMenu(
+            {
+                {
+                    header = 'Land Tax Credit',
+                    isMenuHeader = true,
+                    txt = 'current credit $'..credit,
+                    icon = "fas fa-home"
+                },
+                {
+                    header = 'Add Credit',
+                    txt = '',
+                    icon = 'fas fa-dollar-sign',
+                    params =
+                    {
+                        event = 'legends-houses:client:addcredit',
+                        isServer = false,
+                        args =
+                        {
+                            houseid = houseid,
+                            credit = credit
+                        }
+                    }
+                },
+                {
+                    header = 'Close Menu',
+                    txt = '',
+                    icon = "fas fa-times",
+                    params = {
+                        event = 'legends-menu:closeMenu'
+                    }
+                }
+            })
+        end
+    end)
+end)
+
+-- credit form
+RegisterNetEvent('legends-houses:client:addcredit', function(data)
+    local dialog = exports['legends-input']:ShowInput({
+        header = 'Add Land Tax Credit',
+        submitText = "Add Credit",
+        inputs = {
+            {
+                text = 'Amount',
+                name = "addcredit",
+                type = "number",
+                isRequired = true,
+                default = 50,
+            },
+        }
+    })
+    if dialog ~= nil then
+        for k,v in pairs(dialog) do
+            if Config.Debug == true then
+                print(dialog.addcredit)
+                print(data.houseid)
+            end
+            local newcredit = (data.credit + dialog.addcredit)
+            TriggerServerEvent('legends-houses:server:addcredit', newcredit, dialog.addcredit, data.houseid)
+        end
+    end
+end)
+
+-- Guest Menu
+RegisterNetEvent('legends-houses:client:guestmenu', function(data)
+    legendsCore.Functions.TriggerCallback('legends-houses:server:GetOwnedHouseInfo', function(result)
+        local housecitizenid = result[1].citizenid
+        local houseid = result[1].houseid
+        local playercitizenid = legendsCore.Functions.GetPlayerData().citizenid
+
+        if housecitizenid ~= playercitizenid then
+            legendsCore.Functions.Notify('You didn\'t own this house!', 'error')
+            return
+        end
+
+        if housecitizenid == playercitizenid then
+            exports['legends-menu']:openMenu(
+            {
+                {
+                    header = 'House Guests',
+                    isMenuHeader = true,
+                    txt = '',
+                    icon = "fas fa-home"
+                },
+                {
+                    header = 'Add Guest',
+                    txt = '',
+                    icon = 'fa-solid fa-circle-user',
+                    params =
+                    {
+                        event = 'legends-houses:client:addguest',
+                        isServer = false,
+                        args =
+                        {
+                            houseid = houseid
+                        }
+                    }
+                },
+                {
+                    header = 'Remove Guest',
+                    txt = '',
+                    icon = 'fa-solid fa-circle-user',
+                    params =
+                    {
+                        event = 'legends-houses:client:removeguest',
+                        isServer = false,
+                        args =
+                        {
+                            houseid = houseid
+                        }
+                    }
+                },
+                {
+                    header = 'Close Menu',
+                    txt = '',
+                    icon = "fas fa-times",
+                    params = {
+                        event = 'legends-menu:closeMenu'
+                    }
+                }
+            })
+        end
+    end)
+end)
+
+-- Add House Guest
+RegisterNetEvent('legends-houses:client:addguest', function(data)
+    local dialog = exports['legends-input']:ShowInput(
+    {
+        header = 'Add House Guest',
+        submitText = "Add",
+        inputs =
+        {
+            {
+                text = 'Player ID',
+                name = "playerid",
+                type = "number",
+                isRequired = true,
+            }
+        }
+    })
+
+    if dialog == nil then return end
+
+    if Config.Debug then
+        print("")
+        print("House ID: "..data.houseid)
+        print("Add Guest: "..dialog.playerid)
+        print("")
+    end
+
+    TriggerServerEvent('legends-houses:server:addguest', dialog.playerid, data.houseid)
+end)
+
+-- Remove House Guest
+RegisterNetEvent('legends-houses:client:removeguest', function(data)
+    local GuestMenu =
+    {
+        {
+            header = 'Remove Guest',
+            isMenuHeader = true,
+            icon = "fa-solid fa-circle-info"
+        }
+    }
+
+    legendsCore.Functions.TriggerCallback('legends-houses:server:GetGuestHouseKeys', function(cb)
+        for i = 1, #cb do
+            local guest = cb[i]
+            local houseid = guest.houseid
+            local citizenid = guest.citizenid
+
+            if houseid == data.houseid then
+                GuestMenu[#GuestMenu + 1] =
+                {
+                    header = citizenid,
+                    txt = '',
+                    icon = "fa-solid fa-circle-user",
+                    params =
+                    {
+                        event = "legends-houses:server:removeguest",
+                        isServer = true,
+                        args =
+                        {
+                            guestcid = citizenid,
+                            houseid = houseid
+                        }
+                    }
+                }
+            end
+        end
+
+        GuestMenu[#GuestMenu + 1] =
+        {
+            header = 'Close',
+            icon = "fas fa-times",
+            params =
+            {
+                event = "legends-menu:closeMenu"
+            }
+        }
+
+        exports['legends-menu']:openMenu(GuestMenu)
+    end)
+end)
+
+-- House Storage
+RegisterNetEvent('legends-houses:client:storage', function(data)
+    local house = data.house
+
+    TriggerServerEvent("inventory:server:OpenInventory", "stash", data.house,
+    {
+        maxweight = Config.StorageMaxWeight,
+        slots = Config.StorageMaxSlots,
+    })
+
+    TriggerEvent("inventory:client:SetCurrentStash", house)
+end)
+
+--[[ Threads: End ]]--
+
+
+
+--[[ Resource Cleanup ]]--
+AddEventHandler('onResourceStop', function(resource)
+    if resource ~= GetCurrentResourceName() then return end
+
+    for i = 1, #createdEntries do
+        if createdEntries[i].type == "BLIP" then
+            RemoveBlip(createdEntries[i].handle)
+        end
+
+        if createdEntries[i].type == "nPROMPT" then
+            PromptDelete(createdEntries[i].handle)
+            PromptDelete(createdEntries[i].handle)
+        end
+
+        if createdEntries[i].type == "DOOR" then
+            Citizen.InvokeNative(0xD99229FE93B46286, createdEntries[i].handle, 1, 1, 0, 0, 0, 0) -- AddDoorToSystemNew
+            Citizen.InvokeNative(0x6BAB9442830C7F53, createdEntries[i].handle, 1) -- DoorSystemSetDoorState
+
+            TriggerServerEvent('legends-houses:server:UpdateDoorState', createdEntries[i].handle, 1)
+        end
+    end
+end)
