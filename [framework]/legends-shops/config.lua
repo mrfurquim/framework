@@ -3,6 +3,8 @@ Config = {}
 
 Config.ObjectModel = 'p_cs_lillianbook01x'
 
+Config.ObjectModelWeapons = 'mp001_s_mp_catalogue01x_store'
+
 
 Config.Products = {
     ["normal"] = {
@@ -72,10 +74,10 @@ Config.Locations = {
         name = 'Rhodes General Store',
         location = 'gen-rhodes',
         products = "normal",
-        shopcoords = vector3(1328.99, -1293.28, 77.02 -0.8),
+        showblip = true,
+        shopcoords = vector3(1329.6978, -1292.3437, 77.0718 -0.8),
         blipsprite = 1475879922,
         blipscale = 0.2,
-        showblip = true,
         bookspawn = vector3(1329.6978, -1292.3437, 77.0718)
 
     },
@@ -163,7 +165,9 @@ Config.Locations = {
         shopcoords = vector3(-281.97, 781.09,119.52 -0.8),
         blipsprite = 4149098929,
         blipscale = 0.2,
-        showblip = true
+        showblip = true,
+        catalogue = vector3(-280.9697, 779.8571, 119.5772)
+
     },
     {
         name = 'Tumbleweed Gunsmith',
