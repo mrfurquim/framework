@@ -8,26 +8,16 @@ Citizen.CreateThread(function()
     while not HasModelLoaded(model) do
         Wait(0)
     end
-
-    -- for store, v in pairs(Config.Locations) do
-    --     exports['legends-core']:createPrompt(v.location, v.shopcoords, RSGCore.Shared.Keybinds['J'], Lang:t('menu.open') .. v.name, {
-    --         type = 'client',
-    --         event = 'legends-shops:openshop',
-    --         args = { v.products, v.name },
-    --     })
-
-    --     if v.showblip == true then
-    --         local StoreBlip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.shopcoords)
-    --         if v.products == "normal" or v.products == "weapons" or v.products == "saloon" then
-    --             SetBlipSprite(StoreBlip, v.blipsprite, true)
-    --             SetBlipScale(StoreBlip, v.blipscale)
-    --         end
-    --     end
-    -- end
-
+    local modelweapons = GetHashKey(Config.ObjectModelWeapons) -- Altera o modelo do NPC para o modelo do objeto
+        RequestModel(modelweapons)
+        while not HasModelLoaded(modelweapons) do
+            Wait(0)
+        end
+    
     for _, v in pairs(Config.Locations) do
         local bookspawn = v.bookspawn
         local book = CreateObject(model, bookspawn, true, false, false) -- Cria um objeto no lugar do NPC
+      if v.products == "normal" then
         if v.name == 'Rhodes General Store' then
             SetEntityRotation(book, 0, 0, -115.45453643798828)
         elseif v.name == 'Valentine General Store' then
@@ -45,20 +35,46 @@ Citizen.CreateThread(function()
         elseif v.name == 'Van Horn General Store' then
             SetEntityRotation(book, 0, 0, 79.25359344482422)
         end
-        if v.showblip == true then
-            local StoreBlip = Citizen.InvokeNative(0x554D9D53F696D002, 819673798, v.bookspawn)
-            if v.products == "normal" or v.products == "weapons" or v.products == "saloon" then
-            SetBlipSprite(StoreBlip, v.blipsprite, true)
-            SetBlipScale(StoreBlip, v.blipscale)
-            end
+
+                
+        if v.products == "weapons" and v.name == 'Valentine Gunsmith' then
+        local cataloguespawn = v.catalogue
+        local catalogue = CreateObject(modelweapons, cataloguespawn, true, false, false) -- Cria um objeto no lugar do NPC
+         SetEntityRotation(catalogue, 0, 0, -178.9991912841797)            
+         exports['legends-target']:AddTargetEntity(catalogue, {
+            options = {
+                {
+                    type = "client",
+                    --icon = "far fa-eye",
+                    label = "Abrir Loja",
+                    action = function() 
+                        TriggerEvent('legends-shops:openshop', v.products, v.name)
+                    end,
+                }
+            },
+            distance = 3.0,
+        })
         end
         
+
+
+
+
+        if v.showblip == true then
+        local blip = Citizen.InvokeNative(0x554D9D53F696D002, v.blipsprite, v.bookspawn)
+        if v.products == "normal" then
+            SetBlipSprite(blip, v.blipsprite, true)
+            SetBlipScale(blip, v.blipscale)
+        end
+        Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.name)
+        end
+    end
         exports['legends-target']:AddTargetEntity(book, {
             options = {
                 {
                     type = "client",
                     --icon = "far fa-eye",
-                    label = "Abrir " ..v.name, --"Abrir Loja",
+                    label = "Abrir Loja",
                     action = function() 
                         TriggerEvent('legends-shops:openshop', v.products, v.name)
                     end,
@@ -137,10 +153,9 @@ AddEventHandler('onResourceStop', function(resName)
                 exports['legends-target']:RemoveTargetEntity(ent)    
         
         
+                RemoveBlip(object.blipsprite)
       
         end
-        if object.showblip == true then
-            RemoveBlip()
-        end
+   
     end
 end)
