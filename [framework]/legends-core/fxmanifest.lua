@@ -5,6 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 description 'legends-core'
 
 shared_scripts {
+    '@ox_lib/init.lua',
     'config.lua',
     'shared/locale.lua',
     'locale/en.lua',
@@ -17,7 +18,6 @@ shared_scripts {
     'shared/weapons.lua',
     'shared/locations.lua',
     'shared/keybinds.lua',
-    'client/data/zones.lua'
 }
 
 server_scripts {
@@ -56,6 +56,9 @@ files {
     'client/data/*.lua',
 }
 
-dependency 'oxmysql'
+dependencies {
+    'oxmysql',
+    'ox_lib'
+}
 
 lua54 'yes'

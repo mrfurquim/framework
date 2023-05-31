@@ -16,17 +16,19 @@ RegisterNetEvent('legends-piano:PianoPlay', function(position, heading, animatio
 end)
 
 CreateThread(function()
-    for k, v in pairs(Config.PianoLocation) do
-        exports['legends-core']:createPrompt("legends-piano:Piano"..k, v.SitPosition, RSGCore.Shared.Keybinds['J'], 'Play Piano', {
+    
+    
+    for k, v in pairs(Config.PianoLocation) do  
+        exports['legends-core']:createPrompt("legends-piano:Piano"..k, v.SitPosition, RSGCore.Shared.Keybinds['J'], 'Tocar Piano', {
             type = 'client',
             event = 'legends-piano:PianoPlay',
             args = {v.SitPosition,v.SitHeading,v.Animation}
         })
-        exports['legends-core']:createPrompt("legends-piano:PianoRemove"..k, v.SitPosition, RSGCore.Shared.Keybinds['ENTER'], 'Get Up', {
+        exports['legends-core']:createPrompt("legends-piano:PianoRemove"..k, v.SitPosition, RSGCore.Shared.Keybinds['ENTER'], 'Levantar', {
             type = 'client',
             event = 'legends-piano:PianoPause',
         })
-    end
+        end
 end)
 
 RegisterNetEvent('legends-piano:PianoPause', function()

@@ -76,7 +76,7 @@ Config.Locations = {
         products = "normal",
         showblip = true,
         shopcoords = vector3(1329.6978, -1292.3437, 77.0718 -0.8),
-        blipsprite = 1475879922,
+        blipsprite = 819673798,
         blipscale = 0.2,
         bookspawn = vector3(1329.6978, -1292.3437, 77.0718)
 
@@ -86,7 +86,7 @@ Config.Locations = {
         location = 'gen-valentine',
         products = "normal",
         shopcoords = vector3(-322.433, 803.797, 117.882),
-        blipsprite = 1475879922,
+        blipsprite = 819673798,
         blipscale = 0.2,
         showblip = true,    
         bookspawn = vector3(-323.03, 802.54, 117.94)
@@ -96,7 +96,7 @@ Config.Locations = {
         location = 'gen-strawberry',
         products = "normal",
         shopcoords = vector3(-1791.49, -386.87, 160.33 -0.8),
-        blipsprite = 1475879922,
+        blipsprite = 819673798,
         blipscale = 0.2,
         showblip = true,
         bookspawn = vector3(-1790.332275390625, -387.4543151855469, 160.3863067626953)
@@ -113,7 +113,7 @@ Config.Locations = {
         location = 'gen-stdenis',
         products = "normal",
         shopcoords = vector3(2859.81, -1200.37, 49.59 -0.8),
-        blipsprite = 1475879922,
+        blipsprite = 819673798,
         blipscale = 0.2,
         showblip = true,
         bookspawn = vector3(2859.4807, -1201.3763, 49.6526)
@@ -123,7 +123,7 @@ Config.Locations = {
         location = 'gen-tumbleweed',
         products = "normal",
         shopcoords = vector3(-5487.613, -2938.54, -0.38 -0.8),
-        blipsprite = 1475879922,
+        blipsprite = 819673798,
         blipscale = 0.2,
         showblip = true,
         bookspawn = vector3(-5486.62060546875, -2938.485595703125, -0.34817603230476)
@@ -133,7 +133,7 @@ Config.Locations = {
         location = 'gen-armadillo',
         products = "normal",
         shopcoords = vector3(-3685.56, -2622.59, -13.43 -0.8),
-        blipsprite = 1475879922,
+        blipsprite = 819673798,
         blipscale = 0.2,
         showblip = true,
         bookspawn = vector3(-3686.443359375, -2623.595947265625, -13.36723804473877)
@@ -143,7 +143,7 @@ Config.Locations = {
         location = 'gen-blackwater',
         products = "normal",
         shopcoords = vector3(-785.18, -1323.83, 43.88 -0.8),
-        blipsprite = 1475879922,
+        blipsprite = 819673798,
         blipscale = 0.2,
         showblip = true,
         bookspawn = vector3(-786.0480, -1323.0148, 43.9485)
@@ -153,7 +153,7 @@ Config.Locations = {
         location = 'gen-vanhorn',
         products = "normal",
         shopcoords = vector3(3027.03, 561.00, 44.72 -0.8),
-        blipsprite = 1475879922,
+        blipsprite = 819673798,
         blipscale = 0.2,
         showblip = true,
         bookspawn = vector3(3026.3281, 561.8251, 44.7757)
@@ -167,7 +167,7 @@ Config.Locations = {
         blipscale = 0.2,
         showblip = true,
         catalogue = vector3(-280.9697, 779.8571, 119.5772)
-
+        
     },
     {
         name = 'Tumbleweed Gunsmith',
@@ -176,7 +176,8 @@ Config.Locations = {
         shopcoords = vector3(-5508.14, -2964.33,-0.628 -0.8),
         blipsprite = 4149098929,
         blipscale = 0.2,
-        showblip = true
+        showblip = true,
+        catalogue = vector3(-5507.41259765625, -2964.077392578125, -0.57521855831146)
     },
     {
         name = 'Saint Denis Gunsmith',
@@ -185,7 +186,8 @@ Config.Locations = {
         shopcoords = vector3(2716.42, -1285.42,49.63 -0.8),
         blipsprite = 4149098929,
         blipscale = 0.2,
-        showblip = true
+        showblip = true,
+        catalogue = vector3(2717.154296875, -1286.025146484375, 49.69545745849609)
     },
     {
         name = 'Rhodes Gunsmith',
@@ -194,7 +196,8 @@ Config.Locations = {
         shopcoords = vector3(1322.67, -1323.16,77.88 -0.8),
         blipsprite = 4149098929,
         blipscale = 0.2,
-        showblip = true
+        showblip = true,
+        catalogue = vector3(1323.061767578125, -1322.35498046875, 77.95303344726562)
     },
     {
         name = 'Annesburg Gunsmith',
@@ -203,6 +206,7 @@ Config.Locations = {
         shopcoords = vector3(2946.50, 1319.53,44.82 -0.8),
         blipsprite = 4149098929,
         blipscale = 0.2,
-        showblip = true
+        showblip = true,
+        catalogue = vector3(2947.5166015625, 1319.832763671875, 44.88542175292969)
     },
 }

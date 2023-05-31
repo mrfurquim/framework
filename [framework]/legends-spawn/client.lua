@@ -14,13 +14,14 @@ RegisterNetEvent('legends-spawn:client:openUI', function(value)
     Wait(1000)
     DoScreenFadeIn(250)
     RSGCore.Functions.GetPlayerData(function(PlayerData)
-        cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + camZPlus1, -85.00, 0.00, 0.00, 100.00, false, 0)
+        cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", PlayerData.position.x, PlayerData.position.y,
+            PlayerData.position.z + camZPlus1, -85.00, 0.00, 0.00, 100.00, false, 0)
         SetCamActive(cam, true)
         RenderScriptCams(true, false, 1, true, true)
     end)
     Wait(500)
     SetDisplay(value)
-    
+
 end)
 
 RegisterNUICallback("exit", function(data)
@@ -53,7 +54,8 @@ RegisterNUICallback('setCam', function(data)
 
     if type == "current" then
         RSGCore.Functions.GetPlayerData(function(PlayerData)
-            cam2 = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + camZPlus1, 300.00,0.00,0.00, 110.00, false, 0)
+            cam2 = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", PlayerData.position.x, PlayerData.position.y,
+                PlayerData.position.z + camZPlus1, 300.00, 0.00, 0.00, 110.00, false, 0)
             PointCamAtCoord(cam2, PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + pointCamCoords)
             SetCamActiveWithInterp(cam2, cam, cam1Time, true, true)
             if DoesCamExist(cam) then
@@ -61,7 +63,8 @@ RegisterNUICallback('setCam', function(data)
             end
             Wait(cam1Time)
 
-            cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + camZPlus2, 300.00,0.00,0.00, 110.00, false, 0)
+            cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", PlayerData.position.x, PlayerData.position.y,
+                PlayerData.position.z + camZPlus2, 300.00, 0.00, 0.00, 110.00, false, 0)
             PointCamAtCoord(cam, PlayerData.position.x, PlayerData.position.y, PlayerData.position.z + pointCamCoords2)
             SetCamActiveWithInterp(cam, cam2, cam2Time, true, true)
             SetEntityCoords(PlayerPedId(), PlayerData.position.x, PlayerData.position.y, PlayerData.position.z)
@@ -70,7 +73,8 @@ RegisterNUICallback('setCam', function(data)
     elseif type == "house" then
         local campos = Config.Houses[location].coords.enter
 
-        cam2 = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus1, 300.00,0.00,0.00, 110.00, false, 0)
+        cam2 = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus1, 300.00, 0.00,
+            0.00, 110.00, false, 0)
         PointCamAtCoord(cam2, campos.x, campos.y, campos.z + pointCamCoords)
         SetCamActiveWithInterp(cam2, cam, cam1Time, true, true)
         if DoesCamExist(cam) then
@@ -78,7 +82,8 @@ RegisterNUICallback('setCam', function(data)
         end
         Wait(cam1Time)
 
-        cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus2, 300.00,0.00,0.00, 110.00, false, 0)
+        cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus2, 300.00, 0.00,
+            0.00, 110.00, false, 0)
         PointCamAtCoord(cam, campos.x, campos.y, campos.z + pointCamCoords2)
         SetCamActiveWithInterp(cam, cam2, cam2Time, true, true)
         SetEntityCoords(PlayerPedId(), campos.x, campos.y, campos.z)
@@ -86,7 +91,8 @@ RegisterNUICallback('setCam', function(data)
     elseif type == "normal" then
         local campos = RSG.Spawns[location].coords
 
-        cam2 = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus1, 300.00,0.00,0.00, 110.00, false, 0)
+        cam2 = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus1, 300.00, 0.00,
+            0.00, 110.00, false, 0)
         PointCamAtCoord(cam2, campos.x, campos.y, campos.z + pointCamCoords)
         SetCamActiveWithInterp(cam2, cam, cam1Time, true, true)
         if DoesCamExist(cam) then
@@ -94,7 +100,8 @@ RegisterNUICallback('setCam', function(data)
         end
         Wait(cam1Time)
 
-        cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus2, 300.00,0.00,0.00, 110.00, false, 0)
+        cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus2, 300.00, 0.00,
+            0.00, 110.00, false, 0)
         PointCamAtCoord(cam, campos.x, campos.y, campos.z + pointCamCoords2)
         SetCamActiveWithInterp(cam, cam2, cam2Time, true, true)
         SetEntityCoords(PlayerPedId(), campos.x, campos.y, campos.z)
@@ -102,7 +109,8 @@ RegisterNUICallback('setCam', function(data)
     elseif type == "appartment" then
         local campos = Apartments.Locations[location].coords.enter
 
-        cam2 = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus1, 300.00,0.00,0.00, 110.00, false, 0)
+        cam2 = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus1, 300.00, 0.00,
+            0.00, 110.00, false, 0)
         PointCamAtCoord(cam2, campos.x, campos.y, campos.z + pointCamCoords)
         SetCamActiveWithInterp(cam2, cam, cam1Time, true, true)
         if DoesCamExist(cam) then
@@ -110,7 +118,8 @@ RegisterNUICallback('setCam', function(data)
         end
         Wait(cam1Time)
 
-        cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus2, 300.00,0.00,0.00, 110.00, false, 0)
+        cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", campos.x, campos.y, campos.z + camZPlus2, 300.00, 0.00,
+            0.00, 110.00, false, 0)
         PointCamAtCoord(cam, campos.x, campos.y, campos.z + pointCamCoords2)
         SetCamActiveWithInterp(cam, cam2, cam2Time, true, true)
         SetEntityCoords(PlayerPedId(), campos.x, campos.y, campos.z)
@@ -212,7 +221,7 @@ RegisterNUICallback('spawnplayer', function(data)
         TriggerServerEvent("legends-clothes:LoadClothes", 2)
         newPlayer = false
     end
-    
+
     if isJailed > 0 then
         Wait(2000)
         TriggerEvent('legends-prison:client:prisonclothes')
@@ -312,7 +321,7 @@ RegisterNetEvent('legends-spawn:client:setupSpawns', function(cData, new, apps)
                     for i = 1, (#houses), 1 do
                         table.insert(myHouses, {
                             house = houses[i].house,
-                            label = Config.Houses[houses[i].house].adress,
+                            label = Config.Houses[houses[i].house].adress
                         })
                     end
                 end
@@ -321,26 +330,26 @@ RegisterNetEvent('legends-spawn:client:setupSpawns', function(cData, new, apps)
                 SendNUIMessage({
                     action = "setupLocations",
                     locations = RSG.Spawns,
-                    houses = myHouses,
+                    houses = myHouses
                 })
             end, cData.citizenid)
         else
             SendNUIMessage({
                 action = "setupLocations",
                 locations = RSG.Spawns,
-                houses = {},
+                houses = {}
             })
         end
     elseif new and RSG.EnableApartments then
         SendNUIMessage({
             action = "setupAppartements",
-            locations = apps,
+            locations = apps
         })
     else
         SendNUIMessage({
             action = "setupnewplayerLocations",
             locations = RSG.Spawns,
-            houses = {},
+            houses = {}
         })
     end
 end)
