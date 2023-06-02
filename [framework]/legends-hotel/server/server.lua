@@ -27,6 +27,9 @@ RegisterNetEvent('legends-hotel:server:RentRoom', function(data)
             })
             Player.Functions.RemoveMoney("cash", credit, "room-rental")
             RSGCore.Functions.Notify(src, Lang:t('success.you_rented_room')..roomid, 'success')
+            exports['legends-core']:DisplayLeftNotification(''..Lang:t('success.you_rented_room')..roomid, '', 'generic_textures', 'tick', 3000)
+
+            
         else
             RSGCore.Functions.Notify(src, Lang:t('error.not_enought_cash_to_rent_room'), 'error')
         end

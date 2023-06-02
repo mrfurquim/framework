@@ -47,7 +47,8 @@ RegisterNetEvent('RSGCore:Command:GoToMarker', function()
 
     if not IsWaypointActive() then
         --RSGCore.Functions.Notify(Lang:t("error.no_waypoint"), "error", 3000)
-        TriggerEvent("Notification:LegendsLeft",'error.no_waypoint', '', 'menu_textures', 'cross', 3000)
+        exports['legends-core']:DisplayLeftNotification(''..Lang:t("error.no_waypoint"), '', 'menu_textures', 'cross', 3000)
+
         return
     end
 
@@ -67,7 +68,7 @@ RegisterNetEvent('RSGCore:Command:GoToMarker', function()
     end
 
     --RSGCore.Functions.Notify(Lang:t("success.teleported_waypoint"), "success", 3000)
-    TriggerEvent("Notification:LegendsLeft",''..sucess.teleported_waypoint, '', 'generic_textures', 'tick', 3000)
+    exports['legends-core']:DisplayLeftNotification(''..Lang:t("success.teleported_waypoint"), '', 'generic_textures', 'tick', 3000)
 end)
 
 

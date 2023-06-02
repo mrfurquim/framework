@@ -23,9 +23,16 @@ exports("DisplayLeftNotification", function(title, subTitle, dict, icon, duratio
     struct2:SetInt32(8 * 3, 0)
     struct2:SetInt64(8 * 4, bigInt(GetHashKey(dict)))
     struct2:SetInt64(8 * 5, bigInt(GetHashKey(icon)))
-    struct2:SetInt64(8 * 6, bigInt(GetHashKey(color or "COLOR_WHITE")))
+    if dict == "generic_textures" and icon == "tick" then
+        struct2:SetInt64(8 * 6, bigInt(GetHashKey("COLOR_GREEN")))
+    elseif dict == "menu_textures" and icon == "cross" then
+        struct2:SetInt64(8 * 6, bigInt(GetHashKey("COLOR_RED")))
+    else
+        struct2:SetInt64(8 * 6, bigInt(GetHashKey("COLOR_WHITE")))
+    end
     Citizen.InvokeNative(0x26E87218390E6729, struct1:Buffer(), struct2:Buffer(), 1, 1)
 end)
+
 
 exports("DisplayTopCenterNotification", function(text, location, duration)
     local string1 = CreateVarString(10, "LITERAL_STRING", location)

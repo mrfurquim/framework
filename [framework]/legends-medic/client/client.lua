@@ -207,6 +207,7 @@ CreateThread(function()
                 deathTimer()
                 deathactive = true
                 TriggerServerEvent("RSGCore:Server:SetMetaData", "isdead", true)
+                exports['legends-core']:showDeathNotif("MORREU", "Ledger_Sounds", "INFO_HIDE", 2000)
             end
         end
     end

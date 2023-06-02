@@ -1,0 +1,30 @@
+#idcard {
+  margin-left: 80%;
+  margin-top: 1%;
+  width: 350px;
+  height: 350px;
+  background: url(image.png) center;
+  background-size: 100% 100%;
+  overflow: auto;
+  border-radius: 5px;
+  font-family: typewriter;
+}
+
+@font-face {
+  font-family: typewriter;
+  src: url(TravelingTypewriter.otf);
+}
+
+.info {
+  margin-left: 15%;
+}
+
+.line1 {
+  display: inline;
+}
+
+#signature {
+  font-size: 16px; /* Tamanho da fonte da assinatura */
+  font-style: italic; /* Estilo da fonte da assinatura */
+  margin-top: 10px; /* Espaçamento superior da assinatura */
+}

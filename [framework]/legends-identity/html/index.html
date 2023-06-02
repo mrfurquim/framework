@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Identity Card</title>
+<link type="text/css" rel="stylesheet" href="style.css"/>
+</head>
+  <body>
+    <div id="idcard">
+      <h1 style="text-align:center; margin-top:40px;">Identidade</h1>
+      <div class="info">
+        <h3>Nome: <span id="completename"></span></h3>
+        <h3>Sexo: <span id="gender"></span></h3>
+        <h3>Data de Nascimento: <span id="birthdate"></span></h3>
+        <h3>Trabalho: <span id="corsivo"></span></h3>
+        <h3>Identidade: <span id="citizenid"></span></h3>
+        <h3>Assinatura: <span id="signature"></span></h3> <!-- Novo elemento para exibir a assinatura -->
+      </div>
+      
+    </div>
+	<script type="text/javascript" src="nui://game/ui/jquery.js"></script>
+	<script type="text/javascript" src="listener.js"></script>
+    <script>
+function generateSignature(completename) {
+  // Remova os espaços em branco extras do nome completo
+  completename = completename.trim();
+
+  // Substitua os espaços em branco restantes na assinatura por um caractere especial, como '_'
+  var signature = completename.replace(/\s+/g, ' ');
+
+  // Retorne a assinatura gerada
+  return signature;
+}
+
+
+    </script>
+</body>
+</html>

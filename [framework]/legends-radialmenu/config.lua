@@ -141,6 +141,22 @@ Config.MenuItems = {
                 event = 'legends-telegram:client:OpenAddressbook',
                 shouldClose = true
             },
+            {  
+                id = 'Id card',
+                title = 'Identidade',
+                icon = 'id-badge',
+                type = 'client',
+                event = 'menu:id:start',
+                shouldClose = true
+            },
+            {
+                id= 'Giv Idcard',
+                title = 'Mostrar Identidade',
+                icon = 'id-card',
+                type = 'client',
+                event = 'menu:id:get',
+                shouldClose = true
+            }
         },
     },
     [4] = {
@@ -223,7 +239,7 @@ Config.MenuItems = {
            
         },
     },
-}
+    }
 
 Config.JobInteractions = {
     ["medic"] = {
