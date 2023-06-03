@@ -12,7 +12,7 @@ AddEventHandler('legends-barber:server:SaveSkin', function(CreatorCache, gender)
     if money < price then
         --RSGCore.Functions.Notify('You dont have enough money!', 'error')
         -- TriggerClientEvent('Notification:Left','Ops..' , 'Você não tem dinheiro' , 'menu_textures', 'cross', 3000)
-        exports['legends-core']:DisplayLeftNotification('Opss..', 'Ops', 'menu_textures', 'cross', 3000)
+        exports['legends-core']:DisplayLeftNotification('Opss..', 'Você não tem dinheiro', 'menu_textures', 'cross', 3000)
 
         return
     end
@@ -143,6 +143,6 @@ AddEventHandler('legends-barber:server:SaveSkin', function(CreatorCache, gender)
 
     --RSGCore.Functions.Notify('You have purchased a new style!', 'success')
     -- TriggerClientEvent('Notification:Legends','Sucesso' , 'Você alterou sua aparência' , 'menu_textures', 'cross', 3000)
-    exports['legends-core']:DisplayLeftNotification('Sucesso..', 'Você alterou sua aparência', 'generic_textures', 'tick', 3000)
+    exports['legends-core']:DisplayLeftNotification('Sucesso', 'Você alterou sua aparência', 'generic_textures', 'tick', 3000)
 
 end)

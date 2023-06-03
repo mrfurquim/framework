@@ -16,9 +16,28 @@ RegisterNetEvent('legends-piano:PianoPlay', function(position, heading, animatio
 end)
 
 CreateThread(function()
-    
-    
+
+    local modelhash = GetHashKey("p_piano03x")
+    RequestModel(modelhash)
+    while not HasModelLoaded(modelhash) do
+        Wait(10)
+    end
+
     for k, v in pairs(Config.PianoLocation) do  
+        exports['legends-target']:AddTargetEntity(modelhash, {
+            options = {
+                {
+                    type = "client",
+                    --icon = "far fa-eye",
+                    label = "Tocar Piano",
+                    action = 'legends-piano:PianoPlay',
+                    args = {v.SitPosition,v.SitHeading,v.Animation}
+                }
+            },
+            distance = 3.0,
+        })
+
+
         exports['legends-core']:createPrompt("legends-piano:Piano"..k, v.SitPosition, RSGCore.Shared.Keybinds['J'], 'Tocar Piano', {
             type = 'client',
             event = 'legends-piano:PianoPlay',

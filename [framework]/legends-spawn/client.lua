@@ -228,7 +228,15 @@ RegisterNUICallback('spawnplayer', function(data)
     end
 
     TriggerEvent('legends-houses:client:BlipsOnSpawn')
+
+     if RSG.AutoDualWield then
+        Wait(2000)
+
+        TriggerEvent('rsg-weapons:client:AutoDualWield')
+    end
 end)
+        
+
 
 function SetDisplay(bool)
     choosingSpawn = bool
@@ -280,6 +288,11 @@ RegisterNetEvent('legends-spawn:client:SpawnOnLastLocationOnly', function()
     end
 
     TriggerEvent('legends-houses:client:BlipsOnSpawn')
+    
+        if RSG.AutoDualWield then
+            Wait(2000)
+            TriggerEvent('legends-weapons:client:AutoDualWield')
+        end
 end)
 
 RegisterNetEvent('legends-houses:client:setHouseConfig', function(houseConfig)
